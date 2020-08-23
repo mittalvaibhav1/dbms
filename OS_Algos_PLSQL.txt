@@ -1,0 +1,148 @@
+DECLARE
+algo varchar2(10):=:Algorithm;
+record process%rowtype;
+ctp number(10):=0;
+tatp number(10):=0;
+wtp number(10):=0;
+pid number(10):=0;
+bt number(10):=0;
+art number(10):=0;
+awt number(10):=0;
+tq number(10):=:tq;
+iterator number(10):=0;
+j number(10):=0;
+artvp number(10):=0;
+bt_counter number(10):=0;
+total number(10):=0;
+cursor fcfs is select * from process order by art , pid;
+cursor sjf is select * from process order by art , bt;
+cursor rr is select * from process order by art , pid;
+type timeee IS VARRAY(10) OF process.pid%type;
+pidv  timeee:=timeee();
+btv  timeee:=timeee();
+artv  timeee:=timeee();
+ctv  timeee:=timeee();
+temp number(10):=0;
+BEGIN
+if(algo='FCFS') then
+ open fcfs;
+ LOOP
+  fetch fcfs into record;
+  exit when fcfs%notfound;
+  pid:=record.pid;
+  bt:=record.bt;
+  art:=record.art;
+  if(art>=ctp) then
+  ctp:= art+bt;
+  else
+  ctp:=ctp+bt;
+  end if;
+  tatp:= ctp - art;
+  wtp:= tatp -bt;
+  update process set ct = ctp where pid=record.pid; 
+  update process set tat= tatp where pid = record.pid;
+  update process set wt= wtp where pid = record.pid; 
+ end loop;
+ select avg(wt) into awt from process;
+ dbms_output.put_line(awt);
+ close fcfs;
+elsif(algo='SJF') then
+ open sjf;
+ LOOP
+  fetch sjf into record;
+  exit when sjf%notfound;
+  pid:=record.pid;
+  bt:=record.bt;
+  art:=record.art;
+  if(art>=ctp) then
+  ctp:= art+bt;
+  else
+  ctp:=ctp+bt;
+  end if;
+  tatp:= ctp - art;
+  wtp:= tatp -bt;
+  update process set ct = ctp where pid=record.pid; 
+  update process set tat= tatp where pid = record.pid;
+  update process set wt= wtp where pid = record.pid; 
+  
+ end loop;
+ select avg(wt) into awt from process;
+ dbms_output.put_line(awt);
+ close sjf;
+elsif(algo='RR') then
+ open rr;
+ LOOP
+  iterator:=iterator+1;
+  fetch rr into record;
+  exit when rr%notfound;
+  pidv.extend;
+  btv.extend;
+  artv.extend;
+  ctv.extend;
+  ctv(iterator):=0;
+  pidv(iterator):=record.pid;
+  btv(iterator):=record.bt;
+  artv(iterator):=record.art; 
+ END LOOP;
+ close rr;
+ total:=pidv.count;
+ WHILE bt_counter < total LOOP
+  FOR iterator in 1..total LOOP
+    FOR j in 1..total-1 LOOP
+      if(artv(j) > artv(j+1)) then
+         temp:=artv(j);
+         artv(j):=artv(j+1);
+         artv(j+1):=temp;
+         temp:=pidv(j);
+         pidv(j):=pidv(j+1);
+         pidv(j+1):=temp;
+         temp:=btv(j);
+         btv(j):=btv(j+1);
+         btv(j+1):=temp;
+      end if;
+    END LOOP;
+  END LOOP;
+  dbms_output.put_line(pidv(1) ||' '|| artv(1));
+  if(btv(1)>tq) then
+    btv(1):=btv(1)-tq;
+    if(artv(1)>=artvp) then
+     artv(1):=artv(1)+tq;
+    else
+     artv(1):=artvp+tq;
+    end if;
+    artvp:= artv(1); 
+  else
+    ctv.extend;
+    ctv(pidv(1)):=artv(1)+btv(1);
+    if(artvp<artv(1)+btv(1)) then
+    artvp:= artv(1)+btv(1);
+    else
+    artvp:=artvp+btv(1);
+    end if;
+    btv(1):=0; 
+    artv(1):=1000;
+    bt_counter:=bt_counter+1;
+  end if;
+  dbms_output.put_line(artv(1) ||' '|| artvp);
+ END LOOP;
+ open rr;
+ iterator:=0;
+ LOOP
+  iterator:=iterator+1;
+  fetch rr into record;
+  exit when rr%notfound;
+  pid:=record.pid;
+  bt:=record.bt;
+  art:=record.art;
+  tatp:= ctv(record.pid) - art;
+  wtp:= tatp -bt;
+  update process set ct = ctv(record.pid) where pid=record.pid; 
+  update process set tat= tatp where pid=record.pid;
+  update process set wt= wtp where pid=record.pid;
+ end loop;
+ select avg(wt) into awt from process;
+ dbms_output.put_line(awt);
+ close rr;
+end if;
+END;
+select * from process;

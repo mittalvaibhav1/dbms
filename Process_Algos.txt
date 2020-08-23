@@ -1,0 +1,38 @@
+DECLARE
+algo varchar2(10):=:Algorithm;
+record process%rowtype;
+ctp number(10):=0;
+tatp number(10):=0;
+wtp number(10):=0;
+pid number(10):=0;
+bt number(10):=0;
+art number(10):=0;
+awt number(10):=0;
+cursor fcfs is select * from process order by art;
+BEGIN
+if(algo='FCFS') then
+ open fcfs;
+ LOOP
+  fetch fcfs into record;
+  exit when fcfs%notfound;
+  pid:=record.pid;
+  bt:=record.bt;
+  art:=record.art;
+  if(art>=ctp) then
+  ctp:= art+bt;
+  else
+  ctp:=ctp+bt;
+  end if;
+  tatp:= ctp - art;
+  wtp:= tatP -bt;
+  update process set ct = ctp where pid=record.pid; 
+  update process set tat= tatp where pid = record.pid;
+  update process set wt= wtp where pid = record.pid; 
+  
+ end loop;
+ select avg(wt) into awt from process;
+ dbms_output.put_line(awt);
+ close fcfs;
+end if;
+END;
+select * from process;
