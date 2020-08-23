@@ -1,0 +1,21 @@
+declare 
+a varchar(1);
+b varchar(30):=:b;
+c varchar(30):=:c;
+sum1 number:=0;
+sum2 number:=0;
+begin
+if length(b) != length(c)  then
+  dbms_output.put_line('Not Anagrams');
+else
+  for a in 1..length(b) loop
+   sum1:=sum1+ascii(substr(b,a,1));
+   sum2:=sum2+ascii(substr(c,a,1));
+  end loop;
+  if sum1=sum2 then
+   dbms_output.put_line('Anagrams');
+  else
+   dbms_output.put_line('Not Anagrams');
+  end if;
+end if;
+end;

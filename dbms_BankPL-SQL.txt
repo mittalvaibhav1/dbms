@@ -1,0 +1,50 @@
+create table Bank(
+ acc_no number(10),
+ cust_name varchar2(30),
+ balance number(10),
+ primary key(acc_no)
+) 
+insert into Bank(acc_no,cust_name,balance) values(3,'Kunal',5000)
+select * from bank
+
+DECLARE 
+action varchar2(10):=:Action;
+account_number1 number(10):=:Account_Number_1;
+amount number(10):=:Amount;
+account_number2 number(10):=:Account_Number_2;
+acct_exists bank%rowtype;
+acct_exists2 bank%rowtype;
+BEGIN
+
+if action = 'd' then
+select * into acct_exists from Bank where acc_no=account_number1;
+update bank set balance=balance+amount where acc_no = account_number1;
+select * into acct_exists from Bank where acc_no=account_number1;
+dbms_output.put_line('Updated Balance Of '||acct_exists.cust_name||' is '||acct_exists.balance); 
+
+elsif action = 'w' then
+select * into acct_exists from Bank where acc_no=account_number1;
+  if acct_exists.balance > amount  then
+    update bank set balance=balance-amount where acc_no = account_number1;
+    select * into acct_exists from Bank where acc_no=account_number1;
+    dbms_output.put_line('Widthdrawal Successfull , Updated Balance: '|| acct_exists.balance);
+  else
+    dbms_output.put_line('Not enough balance : Requested : '||amount||' Available : '|| acct_exists.balance);
+  end if;
+else
+select * into acct_exists from Bank where acc_no=account_number1;
+select * into acct_exists2 from Bank where acc_no=account_number2;
+  if acct_exists.balance > amount  then
+    update bank set balance=balance-amount where acc_no = account_number1;
+    update bank set balance=balance+amount where acc_no = account_number2;
+    select * into acct_exists from Bank where acc_no=account_number1;
+    select * into acct_exists2 from Bank where acc_no=account_number2;
+    dbms_output.put_line('Transfer Successfull , Updated Balance of 1st '|| acct_exists.balance || ' ,2nd '|| acct_exists2.balance);
+  else
+    dbms_output.put_line('Not enough balance : Requested : '||amount||' Available : '|| acct_exists.balance);
+  end if;
+end if;
+EXCEPTION
+ WHEN NO_DATA_FOUND  then
+   dbms_output.put_line('Check Input: Wrong Account Number');
+END;

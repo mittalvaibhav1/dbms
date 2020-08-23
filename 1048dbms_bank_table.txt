@@ -1,0 +1,37 @@
+create table bank(acc_no number, custm_name varchar2(10), balance number, primary key(acc_no));
+insert into bank(acc_no, custm_name, balance) values (120034005, 'Sahil', 4000)
+select * from bank
+
+DECLARE
+operation varchar2(1):=:operation;
+amount number:=:amount;
+account number:=:account;
+transfer_acc number:=:transfer_acc;
+bal bank.balance%type;
+
+BEGIN
+select balance into bal from bank where acc_no=account;
+
+if operation='d' then
+update bank set balance=balance+amount where acc_no=account;
+dbms_output.put_line('Transaction Completed');
+
+elsif operation='w' then
+if (bal < amount) then
+dbms_output.put_line('Transaction Declined. Balance is low. Balance amount = '||bal);
+else
+update bank set balance=balance-amount where acc_no=account;
+dbms_output.put_line('Transaction Completed');
+end if;
+
+elsif operation='t' then
+if (bal < amount) then
+dbms_output.put_line('Balance is low. Balance amount = '||bal);
+else
+update bank set balance=balance-amount where acc_no=account;
+update bank set balance=balance+amount where acc_no=transfer_acc;
+dbms_output.put_line('Transaction Completed');
+end if;
+
+end if;
+end;

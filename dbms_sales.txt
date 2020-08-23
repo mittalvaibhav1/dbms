@@ -1,0 +1,48 @@
+create table sales (
+ product_name varchar2(10),
+ product_id number(10),
+ cost_per_piece number(10),
+ quantity number(10),
+ primary key(product_id)
+);
+
+insert into sales(product_name,product_id,cost_per_piece,quantity) values ('Pen',1,10,100);
+insert into sales(product_name,product_id,cost_per_piece,quantity) values ('Pencil',2,5,200);
+insert into sales(product_name,product_id,cost_per_piece,quantity) values ('Eraser',3,4,500);
+
+DECLARE
+op varchar2(10):=:op;
+pen_q number(10):=:pen_q;
+pencil_q number(10):=:pencil_q;
+eraser_q number(10):=:eraser_q;
+bill number(10);
+cost_p sales.cost_per_piece%type;
+cost_e sales.cost_per_piece%type;
+cost_pen sales.cost_per_piece%type;
+BEGIN
+
+if op = 'B' then
+update sales set quantity = quantity - pen_q where product_id = 1;
+update sales set quantity = quantity - pencil_q where product_id = 2;
+update sales set quantity = quantity - eraser_q where product_id = 3;
+select cost_per_piece into cost_p from sales where product_id = 1;
+select cost_per_piece into cost_pen from sales where product_id = 2;
+select cost_per_piece  into cost_e from sales where product_id = 3;
+bill:=cost_p*pen_q+cost_pen*pencil_q+cost_e*eraser_q;
+dbms_output.put_line('Bill' ||' ' || bill);
+
+else
+update sales set quantity = quantity + pen_q where product_id = 1;
+update sales set quantity = quantity + pencil_q where product_id = 2;
+update sales set quantity = quantity + eraser_q where product_id = 3;
+select cost_per_piece into cost_p from sales where product_id = 1;
+select cost_per_piece into cost_pen from sales where product_id = 2;
+select cost_per_piece  into cost_e from sales where product_id = 3;
+bill:=cost_p*pen_q+cost_pen*pencil_q+cost_e*eraser_q;
+dbms_output.put_line('Refund' ||' ' || bill);
+end if;
+END;
+
+
+
+select * from sales

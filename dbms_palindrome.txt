@@ -1,0 +1,21 @@
+declare 
+a number;
+b varchar(30):=:b;
+flag number:=1;
+begin
+if length(b)=1 then 
+ dbms_output.put_line('Palindrome');
+else
+  for a in 1..floor(length(b)/2) loop
+   if substr(b,a,1) != substr(b,length(b)-(a-1),1) then
+     flag:= 0;
+     exit;
+   end if;
+  end loop;
+  if flag=1 then
+    dbms_output.put_line('Palindrome');
+  else
+    dbms_output.put_line('Not Palindrome');
+  end if;
+end if;
+end;

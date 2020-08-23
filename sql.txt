@@ -1,0 +1,30 @@
+create table movies_list(
+    movie_name varchar2(30),
+    movie_duration_mins number(5),
+    movie_lead_m varchar2(30),
+    movie_lead_f varchar2(30),
+    movie_id number(10)
+)
+
+delete from movies_list where movie_name = 'Forrest Gump' and movie_id = 1
+
+insert into movies_list(movie_name,movie_duration_mins,movie_lead_m, movie_lead_f,movie_id) values ('Interstellar',110,'Matthew McConaughey' , 'Anne Hathaway' , 1)
+insert into movies_list(movie_name,movie_duration_mins,movie_lead_m, movie_lead_f,movie_id) values ('Angrezi Medium',130,'Imran Khan' , 'Kareena Kapoor Khan' , 2)
+insert into movies_list(movie_name,movie_duration_mins,movie_lead_m, movie_lead_f,movie_id) values ('Forrest Gump',150,'Tom Hanks' , 'Robin Wright' , 3)
+
+select * from movies_list
+
+create table audi_list(
+    audi_no number(4),
+    movie_id varchar2(30),
+    seats_no number(10)
+)
+delete from audi_list where movie_id=4
+
+insert into audi_list(audi_no,movie_id ,seats_no) values (1,1,200)
+alter table movies_list modify movie_id number(10)
+alter table movies_list add primary key(movie_id)
+alter table audi_list add foreign key (movie_id) references movies_list(movie_id)
+select * from audi_list
+ALTER TABLE audi_list
+ADD FOREIGN KEY (movie_id) REFERENCES movies_list(movie_id);
